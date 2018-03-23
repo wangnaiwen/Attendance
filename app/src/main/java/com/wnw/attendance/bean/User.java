@@ -1,6 +1,7 @@
 package com.wnw.attendance.bean;
 
 import cn.bmob.v3.BmobObject;
+import cn.bmob.v3.datatype.BmobFile;
 
 /**
  * Created by wnw on 2018/3/13.
@@ -11,6 +12,7 @@ public class User extends BmobObject{
     private String gender;
     private String name;
     private String password;
+    private BmobFile image;
 
     public String getsId() {
         return sId;
@@ -42,5 +44,13 @@ public class User extends BmobObject{
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public BmobFile getImage() {
+        return image;
+    }
+
+    public void setImage(BmobFile image) {
+        this.image = image;
     }
 }

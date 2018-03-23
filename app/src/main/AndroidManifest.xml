@@ -50,6 +50,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".view.AboutActivity"/>
+        <activity android:name=".view.SettingActivity"/>
+        <activity android:name=".view.ImgUploadActivity"/>
     </application>
 
 </manifest>

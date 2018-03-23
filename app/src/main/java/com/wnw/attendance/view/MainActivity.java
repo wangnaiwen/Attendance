@@ -1,7 +1,9 @@
 package com.wnw.attendance.view;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import com.vivian.timelineitemdecoration.itemdecoration.DotItemDecoration;
 import com.vivian.timelineitemdecoration.itemdecoration.SpanIndexListener;
@@ -24,8 +27,17 @@ import com.wnw.attendance.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    /**
+     * 用户姓名，学号以及头像
+     * */
+    private TextView ssidTv;
+    private TextView nameTv;
+    private CircleImageView userIcon;
 
     RecyclerView mRecyclerView;
     List<Event> mList = new ArrayList<>();
@@ -97,7 +109,7 @@ public class MainActivity extends AppCompatActivity
                 .setDotColor(Color.WHITE)
                 .setDotRadius(2)
                 .setTopDistance(30)
-                .setLineColor(Color.RED)
+                .setLineColor(Color.WHITE)
                 .setLineWidth(1)//dp
                 .setEndText("END")
                 .setTextColor(Color.WHITE)
@@ -124,6 +136,27 @@ public class MainActivity extends AppCompatActivity
         mAdapter = new DotTimeLineAdapter(this, mList);
         mRecyclerView.setAdapter(mAdapter);
 
+        ssidTv = (TextView)navigationView.getHeaderView(0).findViewById(R.id.tv_ssid);
+        nameTv = (TextView)navigationView.getHeaderView(0).findViewById(R.id.tv_name);
+        userIcon = (CircleImageView)navigationView.getHeaderView(0).findViewById(R.id.icon_user);
+        userIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //头像点击
+                Intent intent = new Intent(MainActivity.this, ImgUploadActivity.class);
+                //intent.putExtra("user", user);
+                startActivityForResult(intent, 4);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            }
+        });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 4){
+            //头像
+        }
     }
 
     @Override
@@ -145,41 +178,30 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // 菜单选中监听
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        if (id == R.id.nav_setting) {
+            Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+        }else if (id == R.id.nav_record){
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        }else if (id == R.id.nav_attendance){
 
         }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 }
