@@ -8,7 +8,7 @@ import cn.bmob.v3.BmobObject;
 
 public class Record extends BmobObject{
     private String sId;
-    private String recordTime;
+    private long recordTime;
     private String attendanceId;
     private String result;
 
@@ -20,11 +20,11 @@ public class Record extends BmobObject{
         this.sId = sId;
     }
 
-    public String getRecordTime() {
+    public long getRecordTime() {
         return recordTime;
     }
 
-    public void setRecordTime(String recordTime) {
+    public void setRecordTime(long recordTime) {
         this.recordTime = recordTime;
     }
 
