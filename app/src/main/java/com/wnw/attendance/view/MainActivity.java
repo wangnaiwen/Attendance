@@ -1,6 +1,8 @@
 package com.wnw.attendance.view;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     DotTimeLineAdapter mAdapter;
     DotItemDecoration mItemDecoration;
 
+    ProgressDialog progressDialog ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,18 +72,9 @@ public class MainActivity extends AppCompatActivity
      * 初始化控件
      * */
     private void initView(){
-
+        progressDialog = new ProgressDialog(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -92,6 +86,35 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         mRecyclerView = (RecyclerView)findViewById(R.id.home_rv_timeline);
+        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
+        mItemDecoration = new DotItemDecoration
+                .Builder(this)
+                .setOrientation(DotItemDecoration.VERTICAL)//if you want a horizontal item decoration,remember to set horizontal orientation to your LayoutManager
+                .setItemStyle(DotItemDecoration.STYLE_DRAW)
+                .setTopDistance(20)//dp
+                .setItemInterVal(10)//dp
+                .setItemPaddingLeft(20)//default value equals to item interval value
+                .setItemPaddingRight(20)//default value equals to item interval value
+                .setDotColor(Color.WHITE)
+                .setDotRadius(2)
+                .setTopDistance(30)
+                .setLineColor(Color.WHITE)
+                .setLineWidth(1)//dp
+                .setEndText("END")
+                .setTextColor(Color.WHITE)
+                .setTextSize(10)//sp
+                .setDotPaddingText(10)//dp.The distance between the last dot and the end text
+                .setBottomDistance(40)//you can add a distance to make bottom line longer
+                .create();
+        mItemDecoration.setSpanIndexListener(new SpanIndexListener() {
+            @Override
+            public void onSpanIndexChange(View view, int spanIndex) {
+                Log.i("Info","view:"+view+"  span:"+spanIndex);
+                view.setBackgroundResource(spanIndex == 0 ? R.drawable.pop_left : R.drawable.pop_right);
+            }
+        });
+        mAdapter = new DotTimeLineAdapter(this, eventList);
+        mRecyclerView.setAdapter(mAdapter);
 
         nothingTv = (TextView)findViewById(R.id.tv_nothing);
         nothingTv.setOnClickListener(new View.OnClickListener() {
@@ -108,10 +131,10 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 //头像点击
-                Intent intent = new Intent(MainActivity.this, ImgUploadActivity.class);
+                /*Intent intent = new Intent(MainActivity.this, ImgUploadActivity.class);
                 //intent.putExtra("user", user);
                 startActivityForResult(intent, 4);
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);*/
             }
         });
 
@@ -119,9 +142,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == 4){
-            //头像
+        if (requestCode == 1001){
+            //指纹识别打卡回来
+            findTodayAttendance();
         }
     }
 
@@ -179,6 +208,7 @@ public class MainActivity extends AppCompatActivity
     //查找今天打卡计划以及打开记录
     List<Attendance> mAttendanceList;
     private void findTodayAttendance(){
+        progressDialog.show();
         Log.e("AttendanceTAG", "find today attendance");
         Calendar c = Calendar.getInstance();//可以对每个时间域单独修改
         int year = c.get(Calendar.YEAR);
@@ -197,6 +227,7 @@ public class MainActivity extends AppCompatActivity
                         Log.e("AttendanceTAG", "无打卡计划");
                         mRecyclerView.setVisibility(View.GONE);
                         nothingTv.setVisibility(View.VISIBLE);
+                        progressDialog.dismiss();
                     }else {
                         Log.e("AttendanceTAG", "有打卡计划");
                         mRecyclerView.setVisibility(View.VISIBLE);
@@ -208,89 +239,75 @@ public class MainActivity extends AppCompatActivity
                     //e.printStackTrace();
                     mRecyclerView.setVisibility(View.GONE);
                     nothingTv.setVisibility(View.VISIBLE);
+                    progressDialog.dismiss();
                     Log.i("AttendanceTAG","失败："+e.getMessage()+","+e.getErrorCode());
                 }
             }
         });
     }
 
-    private List<Event> eventList ;
+    private List<Event> eventList = new ArrayList<>();
     //查找今天的打卡记录
     private void findTodayRecord(){
         Log.e("AttendanceTAG", "find today record");
-        int length = mAttendanceList.size();
+        final int length = mAttendanceList.size();
         eventList = new ArrayList<>(length);
         Log.e("AttendanceTAG", "计划长度" + length);
         for (int i = 0; i < length; i ++){
             Event event = new Event();
-            event.setResult(mAttendanceList.get(i).getAddress());
-            event.setTime(mAttendanceList.get(i).getStartTime());
+            Attendance attendance = mAttendanceList.get(i);
+            event.setAddress(attendance.getAddress());
+            //event.setTime(attendance.getStartTime());
+            event.setEndTime(attendance.getEndTime());
+            event.setAttendanceId(attendance.getObjectId());
+            event.setWifiId(attendance.getWifiId());
+            event.setStartTime(attendance.getStartTime());
             eventList.add(event);
             Log.e("AttendanceTAG", mAttendanceList.get(i).getObjectId() + " " + mAttendanceList.get(i).getAddress());
         }
         for(int i = 0; i < length; i++){
             Log.e("AttendanceTAG", "正在查找今天的记录" + i);
+            SharedPreferences sharedPreferences = getSharedPreferences("account", MODE_PRIVATE);
+            String sid = sharedPreferences.getString("id", "");
             BmobQuery<Record> query = new BmobQuery<Record>();
+            Log.e("AttendanceTAG", mAttendanceList.get(i).getObjectId() +" " +sid);
             query.addWhereEqualTo("attendanceId", mAttendanceList.get(i).getObjectId());
+            query.addWhereEqualTo("sId", sid);
             final int finalI = i;
             query.findObjects(new FindListener<Record>() {
                 @Override
                 public void done(List<Record> list, BmobException e) {
-                    if (e == null && list != null && list.size() > 0){
+                    if (e == null && list.size() > 0){
                         Log.e("AttendanceTAG", "已经有记录");
                         eventList.get(finalI).setResult(list.get(0).getResult());
                         eventList.get(finalI).setTime(list.get(0).getRecordTime());
+                        if (finalI == length-1){
+                            Log.e("AttendanceTAG", "刷新视图 ");
+                            flushView();
+                            progressDialog.dismiss();
+                        }
                     }else{
                         Log.e("AttendanceTAG", "没有记录");
-                        if (mAttendanceList.get(finalI).getEndTime() < System.currentTimeMillis()){
-                            //迟到
-                            eventList.get(finalI).setResult("迟到");
-                        }else{
-                            //待打卡
-                            eventList.get(finalI).setResult("待打卡");
+                        eventList.get(finalI).setResult("待打卡");
+                        if (finalI == length-1){
+                            Log.e("AttendanceTAG", "刷新视图 ");
+                            flushView();
+                            progressDialog.dismiss();
                         }
                     }
                 }
             });
-            if (i == length - 1){
-                Log.e("AttendanceTAG", "刷新视图");
-                flushView();
-            }
         }
     }
 
     //刷新视图
     private void flushView(){
+        if (eventList.size() >= 2){
+            mRecyclerView.removeItemDecoration(mItemDecoration);
+            mRecyclerView.addItemDecoration(mItemDecoration);
+        }
 
-        mRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL));
-        mItemDecoration = new DotItemDecoration
-                .Builder(this)
-                .setOrientation(DotItemDecoration.VERTICAL)//if you want a horizontal item decoration,remember to set horizontal orientation to your LayoutManager
-                .setItemStyle(DotItemDecoration.STYLE_DRAW)
-                .setTopDistance(20)//dp
-                .setItemInterVal(10)//dp
-                .setItemPaddingLeft(20)//default value equals to item interval value
-                .setItemPaddingRight(20)//default value equals to item interval value
-                .setDotColor(Color.WHITE)
-                .setDotRadius(2)
-                .setTopDistance(30)
-                .setLineColor(Color.WHITE)
-                .setLineWidth(1)//dp
-                .setEndText("END")
-                .setTextColor(Color.WHITE)
-                .setTextSize(10)//sp
-                .setDotPaddingText(10)//dp.The distance between the last dot and the end text
-                .setBottomDistance(40)//you can add a distance to make bottom line longer
-                .create();
-        mItemDecoration.setSpanIndexListener(new SpanIndexListener() {
-            @Override
-            public void onSpanIndexChange(View view, int spanIndex) {
-                Log.i("Info","view:"+view+"  span:"+spanIndex);
-                view.setBackgroundResource(spanIndex == 0 ? R.drawable.pop_left : R.drawable.pop_right);
-            }
-        });
-        mRecyclerView.addItemDecoration(mItemDecoration);
-        mAdapter = new DotTimeLineAdapter(this, eventList);
-        mRecyclerView.setAdapter(mAdapter);
+        mAdapter.setList(eventList);
+        mAdapter.notifyDataSetChanged();
     }
 }

@@ -1,7 +1,13 @@
 package com.wnw.attendance.view;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +18,7 @@ import android.widget.Toast;
 import com.vivian.timelineitemdecoration.util.Util;
 import com.wnw.attendance.R;
 import com.wnw.attendance.bean.Event;
+import com.wnw.attendance.util.NetWorkUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,7 +31,7 @@ import java.util.List;
 
 public class  DotTimeLineAdapter extends RecyclerView.Adapter<DotTimeLineAdapter.ViewHolder> {
 
-    Context mContext;
+    Activity mActivity;
     List<Event> mList;
 
     int[] colors = {0xffFFAD6C, 0xff62f434, 0xffdeda78, 0xff7EDCFF, 0xff58fdea, 0xfffdc75f};//颜色组
@@ -33,27 +40,36 @@ public class  DotTimeLineAdapter extends RecyclerView.Adapter<DotTimeLineAdapter
         mList = list;
     }
 
-    public DotTimeLineAdapter(Context context) {
-        mContext = context;
+    public DotTimeLineAdapter(Activity activity) {
+        mActivity = activity;
     }
 
-    public DotTimeLineAdapter(Context context, List<Event> list) {
-        mContext = context;
+    public DotTimeLineAdapter(Activity activity, List<Event> list) {
+        mActivity = activity;
         mList = list;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.pop_item, parent, false);
+        View view = LayoutInflater.from(mActivity).inflate(R.layout.pop_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
-        Date date = new Date(mList.get(position).getTime());
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-        String time = sdf.format(date);
-        holder.timeTv.setText(time);
+    public void onBindViewHolder(ViewHolder holder, final int position) {
+
+        if (mList.get(position).getTime() == 0){
+            Date date = new Date(mList.get(position).getStartTime());
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+            String time = sdf.format(date);
+            holder.timeTv.setText(time);
+        }else{
+            Date date = new Date(mList.get(position).getTime());
+            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+            String time = sdf.format(date);
+            holder.timeTv.setText(time);
+        }
+
         holder.statusTv.setText(mList.get(position).getResult());
         holder.addressTv.setText(mList.get(position).getAddress());
         holder.timeTv.setTextColor(colors[1]);
@@ -62,7 +78,17 @@ public class  DotTimeLineAdapter extends RecyclerView.Adapter<DotTimeLineAdapter
         holder.itemLl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(mContext, "点击事件", Toast.LENGTH_SHORT).show();
+                if (mList.get(position).getResult().equals("迟到")){
+                    //Toast.makeText(mContext, "你已经迟到", Toast.LENGTH_SHORT).show();
+                    //跳转到指纹考勤页面
+                    startFingerPrintActivity(position);
+                }else if (mList.get(position).getResult().equals("待打卡")){
+                    //跳转到指纹识别页面
+                    startFingerPrintActivity(position);
+                }else{
+                    //正常，请假等
+                    Toast.makeText(mActivity, "你已经迟到", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -85,6 +111,21 @@ public class  DotTimeLineAdapter extends RecyclerView.Adapter<DotTimeLineAdapter
             timeTv = (TextView) view.findViewById(R.id.tv_time);
             addressTv = (TextView) view.findViewById(R.id.tv_address);
         }
+    }
 
+    private void startFingerPrintActivity(int position){
+        int i = NetWorkUtils.getAPNType(mActivity);
+        Log.e("wnw", i+"");
+        if (i == 1){
+            if(mList.get(position).getTime() == 0){
+                Intent intent = new Intent(mActivity, FingerPrintActivity.class);
+                intent.putExtra("event", mList.get(position));
+                mActivity.startActivityForResult(intent, 1001);
+            }else{
+                Toast.makeText(mActivity, "已打卡："+mList.get(position).getResult(), Toast.LENGTH_SHORT).show();
+            }
+        }else{
+            Toast.makeText(mActivity, "请你连接到Wifi", Toast.LENGTH_SHORT).show();
+        }
     }
 }

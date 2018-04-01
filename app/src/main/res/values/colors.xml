@@ -10,4 +10,30 @@
     <color name="btn_color_no">#ebd7d5d5</color>
     <color name="btn_color_yes">#0199d6</color>
     <color name="color_btn_normal">#999595</color>
+
+    <color name="white">#fff</color>
+    <color name="action_bar_text_gold">#D6BD99</color>
+    <color name="tab_bg_gray">#2c2c2c</color>
+    <color name="transparent">#0000</color>
+    <color name="top_bg_search">#3c3c3c</color>
+    <color name="hint_search">#ADADAD</color>
+    <color name="emoji_inside">#484848</color>
+    <color name="bg_color_gray_camera">#F4F4F4</color>
+    <color name="text_blue">#507daf</color>
+    <color name="black">#000</color>
+
+    <!--<color name="main_pink">#ff7e7e</color>-->
+    <color name="main_pink">#ff3636</color>
+
+    <color name="gray_btn">#d8d8d8</color>
+    <color name="gray_solid">#e8e8e8</color>
+    <color name="gray_promt_font">#9b9b9b</color>
+    <color name="gray_bg">#f8f8f8</color>
+    <color name="wallet_text_gray">#4a4a4a</color>
+
+    <color name="transparent_gray_thir">#99000000</color>
+    <color name="red">#F2334B</color>
+    <color name="income">#7ed321</color>
+    <color name="bank_card_bg">#e85b5b</color>
+
 </resources>

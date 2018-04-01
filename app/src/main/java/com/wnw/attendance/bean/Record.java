@@ -11,6 +11,7 @@ public class Record extends BmobObject{
     private long recordTime;
     private String attendanceId;
     private String result;
+    private String address;
 
     public String getsId() {
         return sId;
@@ -42,5 +43,13 @@ public class Record extends BmobObject{
 
     public void setResult(String result) {
         this.result = result;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }
