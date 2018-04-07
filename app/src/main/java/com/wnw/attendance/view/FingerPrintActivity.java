@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.hardware.fingerprint.FingerprintManager;
+import android.media.Image;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -17,6 +18,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wnw.attendance.R;
@@ -49,6 +52,9 @@ public class FingerPrintActivity extends AppCompatActivity{
 
     private String wifiMac;
 
+    private ImageView statusIv;
+    private TextView startTv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,9 +66,9 @@ public class FingerPrintActivity extends AppCompatActivity{
     }
 
     private void initView(){
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        statusIv = (ImageView)findViewById(R.id.ig_status);
+        startTv = (TextView)findViewById(R.id.tv_start);
+        startTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //开始打卡
@@ -72,11 +78,13 @@ public class FingerPrintActivity extends AppCompatActivity{
             }
         });
 
+
         SharedPreferences sharedPreferences = getSharedPreferences("account", MODE_PRIVATE);
         sid = sharedPreferences.getString("id", "");
 
         mRecord = new Record();
         mRecord.setsId(sid);
+        mRecord.setAddress(event.getAddress());
         mRecord.setAttendanceId(event.getAttendanceId());
     }
 
@@ -113,11 +121,13 @@ public class FingerPrintActivity extends AppCompatActivity{
         @Override
         public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
             Toast.makeText(FingerPrintActivity.this, "指纹识别成功", Toast.LENGTH_SHORT).show();
+            statusIv.setImageResource(R.drawable.finger_green);
             uploadRecord();
         }
         @Override
         public void onAuthenticationFailed() {
             Toast.makeText(FingerPrintActivity.this, "指纹识别失败,请重新识别", Toast.LENGTH_SHORT).show();
+            statusIv.setImageResource(R.drawable.finger_red);
         }
     };
 

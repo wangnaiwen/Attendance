@@ -43,4 +43,12 @@ dependencies {
 
     //网络图片加载库
     compile 'com.github.bumptech.glide:glide:3.5.2'
+
+    compile('com.github.gzu-liyujiang.AndroidPicker:WheelPicker:1.5.5') {
+        exclude group: 'com.android.support'
+    }
+/*
+    compile('cn.qqtheme.framework:DatePicker:1.5.5') {
+        exclude group: 'com.android.support'
+    }*/
 }

@@ -1,9 +1,6 @@
 package com.wnw.attendance.view;
 
-import android.app.Activity;
-import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,16 +9,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.DatePicker;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import com.wnw.attendance.R;
 import com.wnw.attendance.bean.Attendance;
-import com.wnw.attendance.bean.Record;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -31,6 +24,7 @@ import java.util.List;
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.qqtheme.framework.picker.DatePicker;
 
 /**
  * Created by wnw on 2018/3/23.
@@ -64,32 +58,38 @@ public class AttendanceActivity extends AppCompatActivity {
         // 菜单选中监听
         int id = item.getItemId();
         if (id == R.id.action_pick_date) {
-            DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            DatePicker datePicker = new DatePicker(this);
+            datePicker.setOnDatePickListener(new DatePicker.OnYearMonthDayPickListener() {
                 @Override
-                public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-
+                public void onDatePicked(String year, String month, String day) {
+                    try {
+                        Log.e("AttendanceWnw", year+"-"+month+"-"+day );
+                        Date date = converToDate(year+"-"+month+"-"+day);
+                        long l = 24*60*60*1000; //每天的毫秒数
+                        //date.getTime()是现在的毫秒数，它 减去 当天零点到现在的毫秒数（ 现在的毫秒数%一天总的毫秒数，取余。），理论上等于零点的毫秒数，不过这个毫秒数是UTC+0时区的。
+                        //减8个小时的毫秒值是为了解决时区的问题。
+                        Log.e("AttendanceWnw", date.getTime()+"");
+                        final long startTime = date.getTime();
+                        //final long startTime = (date.getTime() - (date.getTime()%l) - 8* 60 * 60 *1000);
+                        final long endTime = startTime + 24 * 60 * 60 * 1000;
+                        Log.e("AttendanceWnw", startTime + " " +endTime);
+                        findAttendance(startTime, endTime);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             });
+            datePicker.show();
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * 获取下一天
-     * */
-    public static Date getNextDay(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.DAY_OF_MONTH, -1);
-        date = calendar.getTime();
-        return date;
     }
 
     private void initView(){
         recyclerView = (RecyclerView)findViewById(R.id.recycler);
         nothingTv = (TextView)findViewById(R.id.tv_nothing);
         progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("加载中，请稍等...");
 
         Date date = new Date();
         long l = 24*60*60*1000; //每天的毫秒数

@@ -40,7 +40,7 @@
         android:id="@+id/about_contacts"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:text="关于RestaurantAdmin"
+        android:text="关于Attendance"
         android:gravity="center_vertical"
         android:paddingLeft="15dp"/>
     <TextView

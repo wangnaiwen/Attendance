@@ -142,6 +142,7 @@ public class LoginActivity extends Activity implements
                 MODE_PRIVATE).edit();
         editor.clear();
         editor.putString("id", mUser.getsId());
+        editor.putString("name", mUser.getName());
         editor.apply();
     }
 }

@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity
      * */
     private void initView(){
         progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("加载中，请稍等...");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -262,6 +263,7 @@ public class MainActivity extends AppCompatActivity
             event.setAttendanceId(attendance.getObjectId());
             event.setWifiId(attendance.getWifiId());
             event.setStartTime(attendance.getStartTime());
+            event.setResult("待打卡");
             eventList.add(event);
             Log.e("AttendanceTAG", mAttendanceList.get(i).getObjectId() + " " + mAttendanceList.get(i).getAddress());
         }

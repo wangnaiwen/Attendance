@@ -1,10 +1,12 @@
 package com.wnw.attendance.view;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.wnw.attendance.R;
@@ -39,7 +41,7 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
     }
 
     @Override
-    public void onBindViewHolder(AttendanceHolder holder, int position) {
+    public void onBindViewHolder(AttendanceHolder holder, final int position) {
         Attendance attendance = attendanceList.get(position);
         Date startDate = new Date(attendance.getStartTime());
         Date endDate = new Date(attendance.getEndTime());
@@ -47,6 +49,13 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
         holder.startTimeTv.setText("考勤开始：" + sdf.format(startDate));
         holder.endTimeTv.setText("考勤结束：" + sdf.format(endDate));
         holder.addressTv.setText("考勤地点：" + attendance.getAddress());
+        holder.attendacenRl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                context.startActivity(new Intent(context, LeaveActivity.class).putExtra("attendanceId",
+                        attendanceList.get(position).getObjectId()));
+            }
+        });
     }
 
     @Override
@@ -58,9 +67,11 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.At
         TextView startTimeTv;
         TextView endTimeTv;
         TextView addressTv;
+        RelativeLayout attendacenRl;
 
         public AttendanceHolder(View itemView) {
             super(itemView);
+            attendacenRl = (RelativeLayout)itemView.findViewById(R.id.rl_attendance);
             startTimeTv = (TextView)itemView.findViewById(R.id.start_time);
             endTimeTv = (TextView)itemView.findViewById(R.id.end_time);
             addressTv = (TextView)itemView.findViewById(R.id.address);

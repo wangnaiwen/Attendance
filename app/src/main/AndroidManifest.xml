@@ -46,8 +46,7 @@
 
         </activity>
         <activity
-            android:name=".view.LoginActivity"
-            android:label="@string/title_activity_login">
+            android:name=".view.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -60,6 +59,7 @@
         <activity android:name=".view.AttendanceActivity"/>
         <activity android:name=".view.RecordActivity"/>
         <activity android:name=".view.FingerPrintActivity"/>
+        <activity android:name=".view.LeaveActivity"/>
     </application>
 
 </manifest>
