@@ -327,8 +327,15 @@ public class MainActivity extends AppCompatActivity
                         findRecord();
                     }
                 }else{
-                    index ++;
-                    findRecord();
+                    if (index == mAttendanceList.size() - 1){
+                        //查完到最后一个
+                        Log.e("AttendanceTAG", "刷新视图 ");
+                        flushView();
+                        progressDialog.dismiss();
+                    }else{
+                        index ++;
+                        findRecord();
+                    }
                 }
             }
         });
