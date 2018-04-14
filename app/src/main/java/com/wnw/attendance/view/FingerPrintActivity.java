@@ -65,6 +65,9 @@ public class FingerPrintActivity extends AppCompatActivity{
         initView();
     }
 
+    /**
+     * 初始化界面
+     * */
     private void initView(){
         statusIv = (ImageView)findViewById(R.id.ig_status);
         startTv = (TextView)findViewById(R.id.tv_start);
@@ -149,6 +152,9 @@ public class FingerPrintActivity extends AppCompatActivity{
         }
     };
 
+    /**
+     * 开始监听指纹
+     * */
     public void startListening(FingerprintManager.CryptoObject cryptoObject) {
         //android studio 上，没有这个会报错
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT) != PackageManager.PERMISSION_GRANTED) {
@@ -202,6 +208,7 @@ public class FingerPrintActivity extends AppCompatActivity{
         });
     }
 
+    //找到这个考勤计划对应的考勤Wifi的Mac地址，用于和本地登录的wifi进行比较
     private void findWifiMac(){
         BmobQuery<Wifi> query = new BmobQuery<Wifi>();
         Log.e("wnw",event.getWifiId());

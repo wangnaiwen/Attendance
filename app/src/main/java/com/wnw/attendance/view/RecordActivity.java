@@ -2,6 +2,7 @@ package com.wnw.attendance.view;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -88,6 +89,9 @@ public class RecordActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * 初始化View
+     * */
     private void initView(){
         recyclerView = (RecyclerView)findViewById(R.id.recycler);
         nothingTv = (TextView)findViewById(R.id.tv_nothing);
@@ -131,6 +135,8 @@ public class RecordActivity extends AppCompatActivity{
     private void findRecord(long startTime, long endTime){
         progressDialog.show();
         BmobQuery<Record> query = new BmobQuery<Record>();
+        SharedPreferences sharedPreferences = getSharedPreferences("account", MODE_PRIVATE);
+        query.addWhereEqualTo("sId", sharedPreferences.getString("id", ""));
         query.addWhereLessThan("recordTime", endTime);
         query.addWhereGreaterThan("recordTime", startTime);
         query.findObjects(new FindListener<Record>() {

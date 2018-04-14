@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity
 
     private int index = 0;
     private List<Event> eventList = new ArrayList<>();
-    //查找今天的打卡记录
+    //查找今天的打卡记录，这里是去做一些组装的工作
     private void findTodayRecord(){
         index = 0;
         Log.e("AttendanceTAG", "find today record");
@@ -281,27 +281,10 @@ public class MainActivity extends AppCompatActivity
             eventList.add(event);
             Log.e("AttendanceTAG", mAttendanceList.get(i).getObjectId() + " " + mAttendanceList.get(i).getAddress());
         }
-
-        /*BmobQuery<Record> recordBmobQuery = new BmobQuery<>();
-        recordBmobQuery.addWhereContainedIn("attendanceId", Arrays.asList(aId));
-        SharedPreferences sharedPreferences1 = getSharedPreferences("account", MODE_PRIVATE);
-        String sid1 = sharedPreferences1.getString("id", "");
-        recordBmobQuery.addWhereContains("sId", sid1);
-        recordBmobQuery.findObjects(new FindListener<Record>() {
-            @Override
-            public void done(List<Record> list, BmobException e) {
-                if (e == null && list.size() > 0){
-                    Log.d("王乃稳", "找到了 = " +list.size());
-                }else {
-                    e.printStackTrace();
-                    Log.d("王乃稳", "找不到啊");
-                }
-            }
-        });
-*/
         findRecord();
     }
 
+    //查找记录，这里是用递归的方式去查找
     private void findRecord(){
         String attendanceId = mAttendanceList.get(index).getObjectId();
         SharedPreferences sharedPreferences = getSharedPreferences("account", MODE_PRIVATE);

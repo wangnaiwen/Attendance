@@ -49,6 +49,9 @@ public class LeaveActivity extends AppCompatActivity{
         initView();
     }
 
+    /**
+     * 初始化一个View
+     * */
     private void initView(){
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("加载中，请稍等...");
@@ -65,6 +68,9 @@ public class LeaveActivity extends AppCompatActivity{
         findLeave();
     }
 
+    /**
+     * 插入一条请假记录
+     * */
     private void insertLeave(){
         progressDialog.show();
         leave.setStatus("待审批");
@@ -84,6 +90,9 @@ public class LeaveActivity extends AppCompatActivity{
         });
     }
 
+    /**
+     * 查找请假
+     * */
     private void findLeave(){
         progressDialog.show();
         BmobQuery<Leave> query = new BmobQuery<Leave>();

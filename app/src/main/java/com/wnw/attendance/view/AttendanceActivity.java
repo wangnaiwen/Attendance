@@ -84,7 +84,9 @@ public class AttendanceActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
+    /**
+     * 初始化界面
+     * */
     private void initView(){
         recyclerView = (RecyclerView)findViewById(R.id.recycler);
         nothingTv = (TextView)findViewById(R.id.tv_nothing);

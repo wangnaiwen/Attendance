@@ -55,7 +55,6 @@
         </activity>
         <activity android:name=".view.AboutActivity"/>
         <activity android:name=".view.SettingActivity"/>
-        <activity android:name=".view.ImgUploadActivity"/>
         <activity android:name=".view.AttendanceActivity"/>
         <activity android:name=".view.RecordActivity"/>
         <activity android:name=".view.FingerPrintActivity"/>
