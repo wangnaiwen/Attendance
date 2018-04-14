@@ -72,8 +72,12 @@ public class FingerPrintActivity extends AppCompatActivity{
             @Override
             public void onClick(View view) {
                 //开始打卡
-                if (isFinger()){
-                    findWifiMac();
+                if (isArrivalTime()){
+                    if (isFinger()){
+                        findWifiMac();
+                    }
+                }else {
+                    Toast.makeText(FingerPrintActivity.this, "还没有到达考勤时间", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -88,6 +92,20 @@ public class FingerPrintActivity extends AppCompatActivity{
         mRecord.setAttendanceId(event.getAttendanceId());
     }
 
+    /**
+     * 是否到达考勤时间
+     * */
+    private boolean isArrivalTime(){
+        long currentTime = System.currentTimeMillis();
+        if(currentTime < event.getStartTime()){
+             return false;
+        }
+        return true;
+    }
+
+    /**
+     * 是否支持指纹
+     * */
     public boolean isFinger() {
         if (!manager.isHardwareDetected()) {
             Toast.makeText(this, "没有指纹识别模块", Toast.LENGTH_SHORT).show();

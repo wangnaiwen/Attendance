@@ -79,6 +79,7 @@ public class  DotTimeLineAdapter extends RecyclerView.Adapter<DotTimeLineAdapter
             @Override
             public void onClick(View view) {
                 if (mList.get(position).getResult().equals("迟到")){
+                    //Toast.makeText(mActivity, "你已经迟到", Toast.LENGTH_SHORT).show();
                     //Toast.makeText(mContext, "你已经迟到", Toast.LENGTH_SHORT).show();
                     //跳转到指纹考勤页面
                     startFingerPrintActivity(position);
@@ -87,7 +88,7 @@ public class  DotTimeLineAdapter extends RecyclerView.Adapter<DotTimeLineAdapter
                     startFingerPrintActivity(position);
                 }else{
                     //正常，请假等
-                    Toast.makeText(mActivity, "你已经迟到", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mActivity, "已打卡：" + mList.get(position).getResult(), Toast.LENGTH_SHORT).show();
                 }
             }
         });

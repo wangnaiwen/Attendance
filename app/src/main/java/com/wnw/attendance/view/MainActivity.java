@@ -33,6 +33,7 @@ import com.wnw.attendance.bean.User;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -127,6 +128,13 @@ public class MainActivity extends AppCompatActivity
 
         ssidTv = (TextView)navigationView.getHeaderView(0).findViewById(R.id.tv_ssid);
         nameTv = (TextView)navigationView.getHeaderView(0).findViewById(R.id.tv_name);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("account",MODE_PRIVATE);
+        String sid = sharedPreferences.getString("id", "");
+        String name = sharedPreferences.getString("name", "");
+        ssidTv.setText(sid);
+        nameTv.setText(name);
+
         userIcon = (CircleImageView)navigationView.getHeaderView(0).findViewById(R.id.icon_user);
         userIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -209,6 +217,7 @@ public class MainActivity extends AppCompatActivity
     //查找今天打卡计划以及打开记录
     List<Attendance> mAttendanceList;
     private void findTodayAttendance(){
+        mAttendanceList = null;
         progressDialog.show();
         Log.e("AttendanceTAG", "find today attendance");
         Calendar c = Calendar.getInstance();//可以对每个时间域单独修改
@@ -247,16 +256,21 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    private int index = 0;
     private List<Event> eventList = new ArrayList<>();
     //查找今天的打卡记录
     private void findTodayRecord(){
+        index = 0;
         Log.e("AttendanceTAG", "find today record");
         final int length = mAttendanceList.size();
         eventList = new ArrayList<>(length);
         Log.e("AttendanceTAG", "计划长度" + length);
+
+        String[] aId = new String[mAttendanceList.size()];
         for (int i = 0; i < length; i ++){
             Event event = new Event();
             Attendance attendance = mAttendanceList.get(i);
+            aId[i] = attendance.getObjectId();
             event.setAddress(attendance.getAddress());
             //event.setTime(attendance.getStartTime());
             event.setEndTime(attendance.getEndTime());
@@ -267,39 +281,57 @@ public class MainActivity extends AppCompatActivity
             eventList.add(event);
             Log.e("AttendanceTAG", mAttendanceList.get(i).getObjectId() + " " + mAttendanceList.get(i).getAddress());
         }
-        for(int i = 0; i < length; i++){
-            Log.e("AttendanceTAG", "正在查找今天的记录" + i);
-            SharedPreferences sharedPreferences = getSharedPreferences("account", MODE_PRIVATE);
-            String sid = sharedPreferences.getString("id", "");
-            BmobQuery<Record> query = new BmobQuery<Record>();
-            Log.e("AttendanceTAG", mAttendanceList.get(i).getObjectId() +" " +sid);
-            query.addWhereEqualTo("attendanceId", mAttendanceList.get(i).getObjectId());
-            query.addWhereEqualTo("sId", sid);
-            final int finalI = i;
-            query.findObjects(new FindListener<Record>() {
-                @Override
-                public void done(List<Record> list, BmobException e) {
-                    if (e == null && list.size() > 0){
-                        Log.e("AttendanceTAG", "已经有记录");
-                        eventList.get(finalI).setResult(list.get(0).getResult());
-                        eventList.get(finalI).setTime(list.get(0).getRecordTime());
-                        if (finalI == length-1){
-                            Log.e("AttendanceTAG", "刷新视图 ");
-                            flushView();
-                            progressDialog.dismiss();
-                        }
-                    }else{
-                        Log.e("AttendanceTAG", "没有记录");
-                        eventList.get(finalI).setResult("待打卡");
-                        if (finalI == length-1){
-                            Log.e("AttendanceTAG", "刷新视图 ");
-                            flushView();
-                            progressDialog.dismiss();
-                        }
-                    }
+
+        /*BmobQuery<Record> recordBmobQuery = new BmobQuery<>();
+        recordBmobQuery.addWhereContainedIn("attendanceId", Arrays.asList(aId));
+        SharedPreferences sharedPreferences1 = getSharedPreferences("account", MODE_PRIVATE);
+        String sid1 = sharedPreferences1.getString("id", "");
+        recordBmobQuery.addWhereContains("sId", sid1);
+        recordBmobQuery.findObjects(new FindListener<Record>() {
+            @Override
+            public void done(List<Record> list, BmobException e) {
+                if (e == null && list.size() > 0){
+                    Log.d("王乃稳", "找到了 = " +list.size());
+                }else {
+                    e.printStackTrace();
+                    Log.d("王乃稳", "找不到啊");
                 }
-            });
-        }
+            }
+        });
+*/
+        findRecord();
+    }
+
+    private void findRecord(){
+        String attendanceId = mAttendanceList.get(index).getObjectId();
+        SharedPreferences sharedPreferences = getSharedPreferences("account", MODE_PRIVATE);
+        String sid = sharedPreferences.getString("id", "");
+        BmobQuery<Record> query = new BmobQuery<Record>();
+        //Log.e("AttendanceTAG", mAttendanceList.get(i).getObjectId() +" " +sid);
+        query.addWhereEqualTo("attendanceId", attendanceId);
+        query.addWhereEqualTo("sId", sid);
+        //final int finalI = i;
+        query.findObjects(new FindListener<Record>() {
+            @Override
+            public void done(List<Record> list, BmobException e) {
+                if (e == null && list.size() > 0){
+                    eventList.get(index).setResult(list.get(0).getResult());
+                    eventList.get(index).setTime(list.get(0).getRecordTime());
+                    if (index == mAttendanceList.size() - 1){
+                        //查完到最后一个
+                        Log.e("AttendanceTAG", "刷新视图 ");
+                        flushView();
+                        progressDialog.dismiss();
+                    }else{
+                        index ++;
+                        findRecord();
+                    }
+                }else{
+                    index ++;
+                    findRecord();
+                }
+            }
+        });
     }
 
     //刷新视图

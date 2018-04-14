@@ -24,5 +24,6 @@
         android:layout_height="match_parent"
         android:visibility="gone"
         android:text="无任何记录，点我刷新哦"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:textColor="#ffff"/>
 </RelativeLayout>
